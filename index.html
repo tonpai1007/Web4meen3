@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuromi and Flowers</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #fce4ec;
+            font-family: 'Comic Sans MS', cursive;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #instructions {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border-radius: 10px;
+            padding: 10px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div id="instructions">Click anywhere to make flowers bloom! 🌸</div>
+    <canvas id="kuromiCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('kuromiCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Load Kuromi image
+        const kuromi = new Image();
+        kuromi.src = 'https://i.imgur.com/8j9HsZT.png'; // Replace with your own Kuromi image URL
+
+        const flowers = [];
+
+        class Flower {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 30 + 10;
+                this.opacity = 1;
+                this.color = `hsl(${Math.random() * 360}, 80%, 70%)`;
+            }
+
+            draw() {
+                ctx.globalAlpha = this.opacity;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+
+            update() {
+                this.size += 0.5;
+                this.opacity -= 0.02;
+            }
+        }
+
+        function addFlower(x, y) {
+            flowers.push(new Flower(x, y));
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Kuromi in the center
+            const kuromiX = canvas.width / 2 - 100;
+            const kuromiY = canvas.height / 2 - 100;
+            ctx.drawImage(kuromi, kuromiX, kuromiY, 200, 200);
+
+            // Draw and update flowers
+            for (let i = 0; i < flowers.length; i++) {
+                flowers[i].draw();
+                flowers[i].update();
+                if (flowers[i].opacity <= 0) {
+                    flowers.splice(i, 1);
+                    i--;
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        canvas.addEventListener('click', (e) => {
+            addFlower(e.clientX, e.clientY);
+        });
+
+        kuromi.onload = () => {
+            animate();
+        };
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
